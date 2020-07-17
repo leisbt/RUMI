@@ -55,14 +55,24 @@ namespace Address {
 			}
 			
 		}
+		
+		static void ReadCurrentAddress() {
+			
+			using (StreamReader sr = new StreamReader("address.txt")) {
+				Console.WriteLine(sr.ReadLine());
+			}
+			
+		}
 			
 		static void Main(string[] args) {
 			
-			for (int i = 0; i < args.Length; i++) {
-				Console.WriteLine(args[i]);
+			if (args.Length == 1 && args[0] == "/new") {
+				GetNewAddress();
+			} else if (args.Length == 0) {
+				ReadCurrentAddress();
+			} else {
+				Console.WriteLine("Command not recognized");
 			}
-			
-			GetNewAddress();
 			
 		}
 		
