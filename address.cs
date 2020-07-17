@@ -24,6 +24,8 @@ namespace Address {
 		
 		public static void GetNewAddress() {
 			
+			int processAttemptCounter = 0;
+		ProcessAttempt:
 			using (Process process = new Process()) {
 			
 				string responseBody = "";
@@ -31,12 +33,30 @@ namespace Address {
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.FileName = "goAddress.exe";
 				process.Start();
-		
+				
+				int httpResponseAttemptCounter = 0;
 				while (responseBody == "") {
 					
 					try {
 				
 						HttpClient client = new HttpClient();
+						Task.Run(() => {
+							Thread.Sleep(3000);
+							httpResponseAttemptCounter += 1;
+						});
+						if (httpResponseAttemptCounter >= 5) {
+							processAttemptCounter += 1;
+							if (processAttemptCounter >= 4) {
+								Console.WriteLine("Error, timeout!");
+								return;
+							}
+							try {
+								process.CloseMainWindow();
+							} catch (InvalidOperationException) {
+								//process already closed
+							}
+							goto ProcessAttempt;
+						}
 						HttpResponseMessage response = HttpResponse(client).Result;
 						responseBody = HttpResponseBody(response).Result;
 						Console.WriteLine(responseBody);
@@ -47,6 +67,7 @@ namespace Address {
 					} catch (AggregateException e) {
 						
 						Thread.Sleep(100);
+						
 						
 					}
 					
