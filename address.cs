@@ -24,32 +24,38 @@ namespace Address {
 		
 		public static void GetNewAddress() {
 			
-			string responseBody = "";
-			Task.Run(() => {
-				using (Process process = new Process()) {
-					process.StartInfo.UseShellExecute = false;
-					process.StartInfo.CreateNoWindow = true;
-					process.StartInfo.FileName = "goAddress.exe";
-					process.Start();
-				}
-			});
+			using (Process process = new Process()) {
+			
+				string responseBody = "";
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = true;
+				process.StartInfo.FileName = "goAddress.exe";
+				process.Start();
 		
-			while (responseBody == "") {
+				while (responseBody == "") {
+					
+					try {
+				
+						HttpClient client = new HttpClient();
+						HttpResponseMessage response = HttpResponse(client).Result;
+						responseBody = HttpResponseBody(response).Result;
+						Console.WriteLine(responseBody);
+						using (StreamWriter streamWriter = new StreamWriter("address.txt")) {
+							streamWriter.WriteLine(responseBody);
+						}
+					
+					} catch (AggregateException e) {
+						
+						Thread.Sleep(100);
+						
+					}
+					
+				}
 				
 				try {
-			
-					HttpClient client = new HttpClient();
-					HttpResponseMessage response = HttpResponse(client).Result;
-					responseBody = HttpResponseBody(response).Result;
-					Console.WriteLine(responseBody);
-					using (StreamWriter streamWriter = new StreamWriter("address.txt")) {
-						streamWriter.WriteLine(responseBody);
-					}
-				
-				} catch(AggregateException e) {
-					
-					Thread.Sleep(100);
-					
+					process.CloseMainWindow();
+				} catch (InvalidOperationException) {
+					//process already closed
 				}
 				
 			}
