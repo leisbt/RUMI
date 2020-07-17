@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Address {
 	
-	public class Address {
+	public static class Address {
 		
 		static async Task<HttpResponseMessage> HttpResponse(HttpClient client) {
 			
@@ -22,7 +22,7 @@ namespace Address {
 			
 		}
 		
-		static void GetNewAddress() {
+		public static void GetNewAddress() {
 			
 			string responseBody = "";
 			Task.Run(() => {
@@ -56,22 +56,10 @@ namespace Address {
 			
 		}
 		
-		static void ReadCurrentAddress() {
+		public static void ReadCurrentAddress() {
 			
 			using (StreamReader sr = new StreamReader("address.txt")) {
 				Console.WriteLine(sr.ReadLine());
-			}
-			
-		}
-			
-		static void Main(string[] args) {
-			
-			if (args.Length == 1 && args[0] == "/new") {
-				GetNewAddress();
-			} else if (args.Length == 0) {
-				ReadCurrentAddress();
-			} else {
-				Console.WriteLine("Command not recognized");
 			}
 			
 		}
